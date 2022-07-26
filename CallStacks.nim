@@ -18,7 +18,7 @@ import Structs
 ]#
 
 
-var wmiCallStack*:array[10,HelperStackFrame] = [
+var wmiCallStack*:seq[HelperStackFrame] = @[
     HelperStackFrame(dllName: "C:\\Windows\\SYSTEM32\\kernelbase.dll", offset: 0x2c13e, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: false),
     HelperStackFrame(dllName: "C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\CorperfmonExt.dll", offset: 0xc669, totalStackSize: 0, requiresLoadLibrary: true, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: false),
     HelperStackFrame(dllName: "C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\CorperfmonExt.dll", offset: 0xc71b, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: false),
@@ -54,7 +54,7 @@ SourceImage: C:\Windows\system32\svchost.exe
  C:\Windows\System32\KERNEL32.DLL + 17034
  C:\Windows\SYSTEM32\ntdll.dll + 52651
 ]#
-var rpcCallStack*:array[18,HelperStackFrame] = [
+var rpcCallStack*:seq[HelperStackFrame] = @[
     HelperStackFrame(dllName: "C:\\Windows\\SYSTEM32\\kernelbase.dll", offset: 0x32ea6, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: false),
     HelperStackFrame(dllName: "C:\\Windows\\SYSTEM32\\lsm.dll", offset: 0xe959, totalStackSize: 0, requiresLoadLibrary: true, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: false),
     HelperStackFrame(dllName: "C:\\Windows\\SYSTEM32\\RPCRT4.dll", offset: 0x79633, totalStackSize: 0, requiresLoadLibrary: true, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: false),
@@ -92,7 +92,7 @@ var rpcCallStack*:array[18,HelperStackFrame] = [
  C:\Windows\System32\KERNEL32.DLL + 17034
  C:\Windows\SYSTEM32\ntdll.dll + 52651
 ]#
-var svchostCallStack*:array[12,HelperStackFrame] = [
+var svchostCallStack*:seq[HelperStackFrame] = @[
     HelperStackFrame(dllName: "C:\\Windows\\SYSTEM32\\kernelbase.dll", offset: 0x2c13e, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: false),
     HelperStackFrame(dllName: "C:\\Windows\\system32\\sysmain.dll", offset: 0x80e5f, totalStackSize: 0, requiresLoadLibrary: true, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: false),
     HelperStackFrame(dllName: "C:\\Windows\\system32\\sysmain.dll", offset: 0x60ce6, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: false),
