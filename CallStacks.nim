@@ -19,16 +19,16 @@ import Structs
 
 
 var wmiCallStack*:seq[HelperStackFrame] = @[
-    HelperStackFrame(dllName: "C:\\Windows\\SYSTEM32\\kernelbase.dll", offset: 0x2c13e, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: false),
-    HelperStackFrame(dllName: "C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\CorperfmonExt.dll", offset: 0xc669, totalStackSize: 0, requiresLoadLibrary: true, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: false),
-    HelperStackFrame(dllName: "C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\CorperfmonExt.dll", offset: 0xc71b, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: false),
-    HelperStackFrame(dllName: "C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\CorperfmonExt.dll", offset: 0x2fde, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: false),
-    HelperStackFrame(dllName: "C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\CorperfmonExt.dll", offset: 0x2b9e, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: false),
-    HelperStackFrame(dllName: "C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\CorperfmonExt.dll", offset: 0x2659, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: false),
-    HelperStackFrame(dllName: "C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\CorperfmonExt.dll", offset: 0x11b6, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: false),
-    HelperStackFrame(dllName: "C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\CorperfmonExt.dll", offset: 0xc144, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: false),
-    HelperStackFrame(dllName: "C:\\Windows\\SYSTEM32\\kernel32.dll", offset: 0x17034, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: false),
-    HelperStackFrame(dllName: "C:\\Windows\\SYSTEM32\\ntdll.dll", offset: 0x52651, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: false)
+    HelperStackFrame(dllName: "C:\\Windows\\SYSTEM32\\kernelbase.dll", offset: 0x2c13e, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: 0),
+    HelperStackFrame(dllName: "C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\CorperfmonExt.dll", offset: 0xc669, totalStackSize: 0, requiresLoadLibrary: true, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: 0),
+    HelperStackFrame(dllName: "C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\CorperfmonExt.dll", offset: 0xc71b, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: 0),
+    HelperStackFrame(dllName: "C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\CorperfmonExt.dll", offset: 0x2fde, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: 0),
+    HelperStackFrame(dllName: "C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\CorperfmonExt.dll", offset: 0x2b9e, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: 0),
+    HelperStackFrame(dllName: "C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\CorperfmonExt.dll", offset: 0x2659, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: 0),
+    HelperStackFrame(dllName: "C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\CorperfmonExt.dll", offset: 0x11b6, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: 0),
+    HelperStackFrame(dllName: "C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\CorperfmonExt.dll", offset: 0xc144, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: 0),
+    HelperStackFrame(dllName: "C:\\Windows\\SYSTEM32\\kernel32.dll", offset: 0x17034, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: 0),
+    HelperStackFrame(dllName: "C:\\Windows\\SYSTEM32\\ntdll.dll", offset: 0x52651, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: 0)
 ]
 
 #[
@@ -55,24 +55,24 @@ SourceImage: C:\Windows\system32\svchost.exe
  C:\Windows\SYSTEM32\ntdll.dll + 52651
 ]#
 var rpcCallStack*:seq[HelperStackFrame] = @[
-    HelperStackFrame(dllName: "C:\\Windows\\SYSTEM32\\kernelbase.dll", offset: 0x32ea6, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: false),
-    HelperStackFrame(dllName: "C:\\Windows\\SYSTEM32\\lsm.dll", offset: 0xe959, totalStackSize: 0, requiresLoadLibrary: true, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: false),
-    HelperStackFrame(dllName: "C:\\Windows\\SYSTEM32\\RPCRT4.dll", offset: 0x79633, totalStackSize: 0, requiresLoadLibrary: true, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: false),
-    HelperStackFrame(dllName: "C:\\Windows\\SYSTEM32\\RPCRT4.dll", offset: 0x13711, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: false),
-    HelperStackFrame(dllName: "C:\\Windows\\SYSTEM32\\RPCRT4.dll", offset: 0xdd77b, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: false),
-    HelperStackFrame(dllName: "C:\\Windows\\SYSTEM32\\RPCRT4.dll", offset: 0x5d2ac, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: false),
-    HelperStackFrame(dllName: "C:\\Windows\\SYSTEM32\\RPCRT4.dll", offset: 0x5a408, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: false),
-    HelperStackFrame(dllName: "C:\\Windows\\SYSTEM32\\RPCRT4.dll", offset: 0x3a266, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: false),
-    HelperStackFrame(dllName: "C:\\Windows\\SYSTEM32\\RPCRT4.dll", offset: 0x39bb8, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: false),
-    HelperStackFrame(dllName: "C:\\Windows\\SYSTEM32\\RPCRT4.dll", offset: 0x48a0f, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: false),
-    HelperStackFrame(dllName: "C:\\Windows\\SYSTEM32\\RPCRT4.dll", offset: 0x47e18, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: false),
-    HelperStackFrame(dllName: "C:\\Windows\\SYSTEM32\\RPCRT4.dll", offset: 0x47401, totalStackSize: 0, requiresLoadLibrary: true, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: false),
-    HelperStackFrame(dllName: "C:\\Windows\\SYSTEM32\\RPCRT4.dll", offset: 0x46e6e, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: false),
-    HelperStackFrame(dllName: "C:\\Windows\\SYSTEM32\\RPCRT4.dll", offset: 0x4b542, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: false),
-    HelperStackFrame(dllName: "C:\\Windows\\SYSTEM32\\ntdll.dll", offset: 0x20330, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: false),
-    HelperStackFrame(dllName: "C:\\Windows\\SYSTEM32\\ntdll.dll", offset: 0x52f26, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: false),
-    HelperStackFrame(dllName: "C:\\Windows\\SYSTEM32\\kernel32.dll", offset: 0x17034, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: false),
-    HelperStackFrame(dllName: "C:\\Windows\\SYSTEM32\\ntdll.dll", offset: 0x52651, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: false),
+    HelperStackFrame(dllName: "C:\\Windows\\SYSTEM32\\kernelbase.dll", offset: 0x32ea6, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: 0),
+    HelperStackFrame(dllName: "C:\\Windows\\SYSTEM32\\lsm.dll", offset: 0xe959, totalStackSize: 0, requiresLoadLibrary: true, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: 0),
+    HelperStackFrame(dllName: "C:\\Windows\\SYSTEM32\\RPCRT4.dll", offset: 0x79633, totalStackSize: 0, requiresLoadLibrary: true, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: 0),
+    HelperStackFrame(dllName: "C:\\Windows\\SYSTEM32\\RPCRT4.dll", offset: 0x13711, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: 0),
+    HelperStackFrame(dllName: "C:\\Windows\\SYSTEM32\\RPCRT4.dll", offset: 0xdd77b, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: 0),
+    HelperStackFrame(dllName: "C:\\Windows\\SYSTEM32\\RPCRT4.dll", offset: 0x5d2ac, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: 0),
+    HelperStackFrame(dllName: "C:\\Windows\\SYSTEM32\\RPCRT4.dll", offset: 0x5a408, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: 0),
+    HelperStackFrame(dllName: "C:\\Windows\\SYSTEM32\\RPCRT4.dll", offset: 0x3a266, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: 0),
+    HelperStackFrame(dllName: "C:\\Windows\\SYSTEM32\\RPCRT4.dll", offset: 0x39bb8, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: 0),
+    HelperStackFrame(dllName: "C:\\Windows\\SYSTEM32\\RPCRT4.dll", offset: 0x48a0f, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: 0),
+    HelperStackFrame(dllName: "C:\\Windows\\SYSTEM32\\RPCRT4.dll", offset: 0x47e18, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: 0),
+    HelperStackFrame(dllName: "C:\\Windows\\SYSTEM32\\RPCRT4.dll", offset: 0x47401, totalStackSize: 0, requiresLoadLibrary: true, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: 0),
+    HelperStackFrame(dllName: "C:\\Windows\\SYSTEM32\\RPCRT4.dll", offset: 0x46e6e, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: 0),
+    HelperStackFrame(dllName: "C:\\Windows\\SYSTEM32\\RPCRT4.dll", offset: 0x4b542, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: 0),
+    HelperStackFrame(dllName: "C:\\Windows\\SYSTEM32\\ntdll.dll", offset: 0x20330, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: 0),
+    HelperStackFrame(dllName: "C:\\Windows\\SYSTEM32\\ntdll.dll", offset: 0x52f26, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: 0),
+    HelperStackFrame(dllName: "C:\\Windows\\SYSTEM32\\kernel32.dll", offset: 0x17034, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: 0),
+    HelperStackFrame(dllName: "C:\\Windows\\SYSTEM32\\ntdll.dll", offset: 0x52651, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: 0),
 ]
 
 #[
@@ -93,16 +93,16 @@ var rpcCallStack*:seq[HelperStackFrame] = @[
  C:\Windows\SYSTEM32\ntdll.dll + 52651
 ]#
 var svchostCallStack*:seq[HelperStackFrame] = @[
-    HelperStackFrame(dllName: "C:\\Windows\\SYSTEM32\\kernelbase.dll", offset: 0x2c13e, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: false),
-    HelperStackFrame(dllName: "C:\\Windows\\system32\\sysmain.dll", offset: 0x80e5f, totalStackSize: 0, requiresLoadLibrary: true, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: false),
-    HelperStackFrame(dllName: "C:\\Windows\\system32\\sysmain.dll", offset: 0x60ce6, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: false),
-    HelperStackFrame(dllName: "C:\\Windows\\system32\\sysmain.dll", offset: 0x2a7d3, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: false),
-    HelperStackFrame(dllName: "C:\\Windows\\system32\\sysmain.dll", offset: 0x2a331, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: false),
-    HelperStackFrame(dllName: "C:\\Windows\\system32\\sysmain.dll", offset: 0x66cf1, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: false),
-    HelperStackFrame(dllName: "C:\\Windows\\system32\\sysmain.dll", offset: 0x7b59e, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: false),
-    HelperStackFrame(dllName: "C:\\Windows\\system32\\sysmain.dll", offset: 0x67ecf, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: false),
-    HelperStackFrame(dllName: "C:\\Windows\\SYSTEM32\\svchost.exe", offset: 0x4300, totalStackSize: 0, requiresLoadLibrary: true, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: false),
-    HelperStackFrame(dllName: "C:\\Windows\\SYSTEM32\\sechost.dll", offset: 0xdf78, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: false),
-    HelperStackFrame(dllName: "C:\\Windows\\SYSTEM32\\kernel32.dll", offset: 0x17034, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: false),
-    HelperStackFrame(dllName: "C:\\Windows\\SYSTEM32\\ntdll.dll", offset: 0x52651, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: false)
+    HelperStackFrame(dllName: "C:\\Windows\\SYSTEM32\\kernelbase.dll", offset: 0x2c13e, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: 0),
+    HelperStackFrame(dllName: "C:\\Windows\\system32\\sysmain.dll", offset: 0x80e5f, totalStackSize: 0, requiresLoadLibrary: true, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: 0),
+    HelperStackFrame(dllName: "C:\\Windows\\system32\\sysmain.dll", offset: 0x60ce6, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: 0),
+    HelperStackFrame(dllName: "C:\\Windows\\system32\\sysmain.dll", offset: 0x2a7d3, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: 0),
+    HelperStackFrame(dllName: "C:\\Windows\\system32\\sysmain.dll", offset: 0x2a331, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: 0),
+    HelperStackFrame(dllName: "C:\\Windows\\system32\\sysmain.dll", offset: 0x66cf1, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: 0),
+    HelperStackFrame(dllName: "C:\\Windows\\system32\\sysmain.dll", offset: 0x7b59e, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: 0),
+    HelperStackFrame(dllName: "C:\\Windows\\system32\\sysmain.dll", offset: 0x67ecf, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: 0),
+    HelperStackFrame(dllName: "C:\\Windows\\SYSTEM32\\svchost.exe", offset: 0x4300, totalStackSize: 0, requiresLoadLibrary: true, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: 0),
+    HelperStackFrame(dllName: "C:\\Windows\\SYSTEM32\\sechost.dll", offset: 0xdf78, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: 0),
+    HelperStackFrame(dllName: "C:\\Windows\\SYSTEM32\\kernel32.dll", offset: 0x17034, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: 0),
+    HelperStackFrame(dllName: "C:\\Windows\\SYSTEM32\\ntdll.dll", offset: 0x52651, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: 0)
 ]
