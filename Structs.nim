@@ -13,7 +13,7 @@ type
         setsFramePointer*:bool
         returnAddress*:uint64
         pushRbp*:bool
-        countOfCodes*:uint64
+        countOfCodes*:int
         pushRbpIndex*:int
     
     #[
