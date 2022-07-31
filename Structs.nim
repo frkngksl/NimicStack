@@ -53,8 +53,8 @@ type
         countOfCodes*: uint8
         frameRegister* {.bitsize: 4.}: uint8
         frameOffset* {.bitsize: 4.}: uint8
-        unwindCode*: ptr UNWIND_CODE
-
+        #unwindCode*: ptr UNWIND_CODE
+        unwindCode*:array[1,UNWIND_CODE]
     #[
     typedef enum _UNWIND_OP_CODES {
     UWOP_PUSH_NONVOL = 0, /* info == register number */

