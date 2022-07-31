@@ -329,7 +329,6 @@ proc VehCallback(exceptionInfo:PEXCEPTION_POINTERS):LONG {.stdcall.} =
         return EXCEPTION_CONTINUE_SEARCH
     if(exceptionCode == STATUS_ACCESS_VIOLATION):
         echo "[+] Veh is called!"
-        Sleep(5000)
         echo "[+] Redirecting thread to RtlExitUserThread"
         exceptionInfo.ContextRecord.Rip = cast[DWORD64](GetProcAddress(GetModuleHandleA("ntdll"),"RtlExitUserThread"))
         exceptionInfo.ContextRecord.Rcx = 0
@@ -402,4 +401,3 @@ when isMainModule:
         quit(-1)
     else:
         echo "[+] Spoof is successful"
-    Sleep(100000)
