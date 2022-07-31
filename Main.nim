@@ -142,7 +142,7 @@ proc CalculateFunctionStackSize(pRuntimeFunction:PRUNTIME_FUNCTION,imageBase:DWO
         unwindDataIndex = cast[int](pUnwindInfo.countOfCodes)
         if( (unwindDataIndex and 1) != 0):
             unwindDataIndex+=1
-        pRuntimeFunctionTemp = cast[PRUNTIME_FUNCTION](addr(pUnwindInfo.unwindCode[unwindDataIndex]))
+        pRuntimeFunctionTemp = cast[PRUNTIME_FUNCTION](addr(unwindCodeArrayCursor[unwindDataIndex]))
         return CalculateFunctionStackSize(pRuntimeFunctionTemp, imageBase, indexToStackFrame);
     selectedStackFrame[indexToStackFrame].totalStackSize += 8
     return returnValue
@@ -209,6 +209,7 @@ proc PushtoStack(value:ULONG64):void =
     context.Rsp = cast[ULONG64](cast[uint64](context.Rsp)-0x8)
     var AddressToWrite:PULONG64 = cast[PULONG64](context.Rsp)
     AddressToWrite[] = value
+    echo value
 
 proc InitializeFakeThreadStack():void = 
     var childSp:ULONG64 = 0
@@ -295,6 +296,7 @@ proc InitializeFakeThreadStack():void =
             bPreviousFrameSetUWOP_SET_FPREG = false
         else:
             # If normal frame, decrement total stack size and write RET address
+            echo selectedStackFrame[i].totalStackSize
             context.Rsp -= cast[DWORD64](selectedStackFrame[i].totalStackSize)
             var fakeRetAddress:PULONG64 = cast[PULONG64](context.Rsp)
             fakeRetAddress[] = cast[ULONG64](selectedStackFrame[i].returnAddress)
@@ -327,8 +329,9 @@ proc VehCallback(exceptionInfo:PEXCEPTION_POINTERS):LONG {.stdcall.} =
         return EXCEPTION_CONTINUE_SEARCH
     if(exceptionCode == STATUS_ACCESS_VIOLATION):
         echo "[+] Veh is called!"
+        Sleep(5000)
         echo "[+] Redirecting thread to RtlExitUserThread"
-        exceptionInfo.ContextRecord.Rip = cast[DWORD64](GetProcAddress(GetModuleHandleA("ntdll.dll"),"RtlExitUserThread"))
+        exceptionInfo.ContextRecord.Rip = cast[DWORD64](GetProcAddress(GetModuleHandleA("ntdll"),"RtlExitUserThread"))
         exceptionInfo.ContextRecord.Rcx = 0
         return EXCEPTION_CONTINUE_EXECUTION
     return EXCEPTION_CONTINUE_EXECUTION
@@ -361,7 +364,7 @@ when isMainModule:
         echo "[!] Failed to create suspended thread"
         quit(-1)    
     context.ContextFlags = CONTEXT_FULL
-    if(0 == GetThreadContext(hThread, addr context)):
+    if(FALSE == GetThreadContext(hThread, addr context)):
         echo "[!] Error on GetThreadContext!"
         quit(-1)
     InitializeFakeThreadStack()
@@ -389,7 +392,6 @@ when isMainModule:
     if(cast[uint64](AddVectoredExceptionHandler(1,cast[PVECTORED_EXCEPTION_HANDLER](VehCallback))) == 0):
         echo "[!] Failed to add vectored exception handler!"
         quit(-1)
-
     if(ResumeThread(hThread) == -1):
         echo "[!] Failed to resume suspended thread!"
         quit(-1)
@@ -400,3 +402,4 @@ when isMainModule:
         quit(-1)
     else:
         echo "[+] Spoof is successful"
+    Sleep(100000)
