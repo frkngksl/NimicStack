@@ -18,6 +18,9 @@ Like the reference project, NimicStack can mimic three example call stacks which
 
 `.\NimicStack.exe <--wmi, --rpc, --svchost>`
 
+<img width="1246" alt="image" src="https://user-images.githubusercontent.com/26549173/182203399-9ace7885-cd7a-40a5-bb75-fd7d71c896cf.png">
+
+
 # References
 
 - https://labs.withsecure.com/blog/spoofing-call-stacks-to-confuse-edrs/
