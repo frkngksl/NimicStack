@@ -106,3 +106,6 @@ var svchostCallStack*:seq[HelperStackFrame] = @[
     HelperStackFrame(dllName: "C:\\Windows\\SYSTEM32\\kernel32.dll", offset: 0x17034, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: 0),
     HelperStackFrame(dllName: "C:\\Windows\\SYSTEM32\\ntdll.dll", offset: 0x52651, totalStackSize: 0, requiresLoadLibrary: false, setsFramePointer: false, returnAddress: 0,pushRbp: false,countOfCodes: 0,pushRbpIndex: 0)
 ]
+
+
+# x86 call stacks
